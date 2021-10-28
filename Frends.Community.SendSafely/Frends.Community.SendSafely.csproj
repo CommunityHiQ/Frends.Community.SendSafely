@@ -26,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Windows-Client\Windows-Client-API-master\SendsafelyAPI\SendsafelyAPI.csproj">
+    <ProjectReference Include="..\SendsafelyAPI\SendsafelyAPI.csproj">
       <PrivateAssets>all</PrivateAssets>
     </ProjectReference>
   </ItemGroup>
