@@ -1,0 +1,19 @@
+﻿{
+	"Tasks": [
+		{
+			"TaskMethod": "Frends.Community.SendSafely.SendSafelyTasks.DownloadFiles"
+		},
+		{
+			"TaskMethod": "Frends.Community.SendSafely.SendSafelyTasks.UploadFiles"
+		},
+		{
+			"TaskMethod": "Frends.Community.SendSafely.SendSafelyTasks.GetDirectories"
+		},
+		{
+			"TaskMethod": "Frends.Community.SendSafely.SendSafelyTasks.GetFiles"
+		},
+		{
+			"TaskMethod": "Frends.Community.SendSafely.SendSafelyTasks.GetPackageInformation"
+		}
+	]
+}
