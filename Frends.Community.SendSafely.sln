@@ -13,7 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SendsafelyAPI", "..\Windows-Client\Windows-Client-API-master\SendsafelyAPI\SendsafelyAPI.csproj", "{9BDEB9EC-7B8C-44DD-A3A1-9EF4F2B2499E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SendsafelyAPI", "SendsafelyAPI\SendsafelyAPI.csproj", "{9BDEB9EC-7B8C-44DD-A3A1-9EF4F2B2499E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
