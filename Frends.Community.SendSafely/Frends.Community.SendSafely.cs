@@ -20,39 +20,33 @@ namespace Frends.Community.SendSafely
         /// Documentation: https://github.com/CommunityHiQ/Frends.Community.SendSafely
         /// </summary>
 
-        private List<UploadFilesResult> newEntries = new List<UploadFilesResult>();
-        private List<DownloadFilesResult> downloadedFiles = new List<DownloadFilesResult>();
-        private List<GetDirectoriesResult> directories = new List<GetDirectoriesResult>();
-        private List<FileInfoWithDirInfo> fileInformation = new List<FileInfoWithDirInfo>();
-
         /// <summary>
         /// Downloads files from the given workspace directory and its subdirectories and decrypts them. If a date is given, downloads only files that are created or modified after the date.
         /// </summary>
         /// <returns>List [ Object { string Name, string Directory, string FullPath, string OrigName, string OrigDirectory, string OrigDirectoryId, DateTime CreationTime } ]</returns>
         public static List<DownloadFilesResult> DownloadFiles(Parameters parameters, DownloadFilesInput input, CancellationToken cancellationToken)
         {
-            return new SendSafelyTasks().DownloadFilesNonStatic(parameters, input, cancellationToken);
-        }
+            List<DownloadFilesResult> filesList;
 
-        private List<DownloadFilesResult> DownloadFilesNonStatic(Parameters parameters, DownloadFilesInput input, CancellationToken cancellationToken)
-        {
             api.ClientAPI ssApi = InitializeApi(parameters);
 
             if (string.IsNullOrEmpty(input.Date))
             {
-                DownloadFilesRecursively(ssApi, input.PackageId, input.PackageKeyCode, input.DirectoryId, cancellationToken);
+                filesList = DownloadFilesRecursively(ssApi, input.PackageId, input.PackageKeyCode, input.DirectoryId, cancellationToken);
             }
             else
             {
                 DateTime dateTime = DateTime.Parse(input.Date);
-                DownloadFilesUploadedAfterDate(ssApi, input.PackageId, input.PackageKeyCode, dateTime, cancellationToken);
+                filesList = DownloadFilesUploadedAfterDate(ssApi, input.PackageId, input.PackageKeyCode, dateTime, cancellationToken);
             }
 
-            return downloadedFiles;
+            return filesList;
         }
 
-        private void DownloadFilesRecursively(api.ClientAPI ssApi, string packageId, string keyCode, string dirId, CancellationToken cancellationToken)
+        private static List<DownloadFilesResult> DownloadFilesRecursively(api.ClientAPI ssApi, string packageId, string keyCode, string dirId, CancellationToken cancellationToken)
         {
+            List<DownloadFilesResult> downloadedFiles = new List<DownloadFilesResult>();
+
             api.Directory dir = ssApi.GetDirectory(packageId, dirId, 0, 0);
 
             foreach (var file in dir.Files)
@@ -65,15 +59,19 @@ namespace Frends.Community.SendSafely
 
             foreach (var subdir in dir.SubDirectories)
             {
-                DownloadFilesRecursively(ssApi, packageId, keyCode, subdir.DirectoryId, cancellationToken);
+                downloadedFiles.AddRange(DownloadFilesRecursively(ssApi, packageId, keyCode, subdir.DirectoryId, cancellationToken));
             }
+
+            return downloadedFiles;
         }
 
-        private void DownloadFilesUploadedAfterDate(api.ClientAPI ssApi, string packageId, string keyCode, DateTime date, CancellationToken cancellationToken)
+        private static List<DownloadFilesResult> DownloadFilesUploadedAfterDate(api.ClientAPI ssApi, string packageId, string keyCode, DateTime date, CancellationToken cancellationToken)
         {
+            List<DownloadFilesResult> downloadedFiles = new List<DownloadFilesResult>();
+
             api.PackageInformation pkgInfo = ssApi.GetPackageInformation(packageId);
 
-            GetFileInformationRecursively(ssApi, pkgInfo.PackageId, pkgInfo.RootDirectoryId, cancellationToken);
+            var fileInformation = GetFileInformationRecursively(ssApi, pkgInfo.PackageId, pkgInfo.RootDirectoryId, cancellationToken);
 
             var newFiles = fileInformation.Where(f => f.uploaded > date);
 
@@ -83,6 +81,8 @@ namespace Frends.Community.SendSafely
                 DownloadFilesResult fileInfo = new DownloadFilesResult(downloadedFile, file);
                 downloadedFiles.Add(fileInfo);
             }
+
+            return downloadedFiles;
         }
 
         /// <summary>
@@ -91,22 +91,19 @@ namespace Frends.Community.SendSafely
         /// <returns>List [ Object { string Name, string Id, bool IsFile } ]</returns>
         public static List<UploadFilesResult> UploadFiles(Parameters parameters, UploadFilesInput input, CancellationToken cancellationToken)
         {
-            return new SendSafelyTasks().UploadFilesNonStatic(parameters, input, cancellationToken);
-        }
-
-        private List<UploadFilesResult> UploadFilesNonStatic(Parameters parameters, UploadFilesInput input, CancellationToken cancellationToken)
-        {
             api.ClientAPI ssApi = InitializeApi(parameters);
             api.PackageInformation pkgInfo = ssApi.GetPackageInformation(input.PackageId);
             api.Directory root = ssApi.GetDirectory(input.PackageId, pkgInfo.RootDirectoryId, 0, 0);
 
-            UploadFilesRecursively(ssApi, input.Path, root, input.PackageId, input.PackageKeyCode, cancellationToken);
+            List<UploadFilesResult> newEntries = UploadFilesRecursively(ssApi, input.Path, root, input.PackageId, input.PackageKeyCode, cancellationToken);
 
             return newEntries;
         }
 
-        private void UploadFilesRecursively(api.ClientAPI ssApi, string localDirPath, api.Directory ssDir, string packageId, string keyCode, CancellationToken cancellationToken)
+        private static List<UploadFilesResult> UploadFilesRecursively(api.ClientAPI ssApi, string localDirPath, api.Directory ssDir, string packageId, string keyCode, CancellationToken cancellationToken)
         {
+            List<UploadFilesResult> newEntries = new List<UploadFilesResult>();
+
             string[] files = System.IO.Directory.GetFiles(localDirPath, "*", SearchOption.TopDirectoryOnly);
 
             foreach (string file in files)
@@ -136,8 +133,10 @@ namespace Frends.Community.SendSafely
                     newEntries.Add(new UploadFilesResult(nextDir));
                 }
 
-                UploadFilesRecursively(ssApi, subdir, nextDir, packageId, keyCode, cancellationToken);
+                newEntries.AddRange(UploadFilesRecursively(ssApi, subdir, nextDir, packageId, keyCode, cancellationToken));
             }
+
+            return newEntries;
         }
 
         /// <summary>
@@ -146,26 +145,25 @@ namespace Frends.Community.SendSafely
         /// <returns>List [ Object { SendSafely.Directory UserDirectory, string DirectoryName, string DirectoryId, List&lt;FileResponse&gt; Files, Collection&lt;DirectoryResponse&gt; SubDirectories } ]</returns>
         public static List<GetDirectoriesResult> GetDirectories(Parameters parameters, GetDirectoriesInput input, CancellationToken cancellationToken)
         {
-            return new SendSafelyTasks().GetDirectoriesNonStatic(parameters, input, cancellationToken);
-        }
-
-        private List<GetDirectoriesResult> GetDirectoriesNonStatic(Parameters parameters, GetDirectoriesInput input, CancellationToken cancellationToken)
-        {
             api.ClientAPI ssApi = InitializeApi(parameters);
-            GetDirectoriesRecursively(ssApi, input.PackageId, input.RootDirectoryId, cancellationToken);
-            return directories;
+            List<GetDirectoriesResult> result = GetDirectoriesRecursively(ssApi, input.PackageId, input.RootDirectoryId, cancellationToken);
+            return result;
         }
 
-        private void GetDirectoriesRecursively(api.ClientAPI ssApi, string packageId, string rootId, CancellationToken cancellationToken)
+        private static List<GetDirectoriesResult> GetDirectoriesRecursively(api.ClientAPI ssApi, string packageId, string rootId, CancellationToken cancellationToken)
         {
+            List<GetDirectoriesResult> directoryList = new List<GetDirectoriesResult>();
+
             api.Directory dir = ssApi.GetDirectory(packageId, rootId, 0, 0);
-            directories.Add(new GetDirectoriesResult(dir));
+            directoryList.Add(new GetDirectoriesResult(dir));
 
             foreach (var subdir in dir.SubDirectories)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                GetDirectoriesRecursively(ssApi, packageId, subdir.DirectoryId, cancellationToken);
+                directoryList.AddRange(GetDirectoriesRecursively(ssApi, packageId, subdir.DirectoryId, cancellationToken));
             }
+
+            return directoryList;
         }
 
          /// <summary>
@@ -174,24 +172,41 @@ namespace Frends.Community.SendSafely
         /// <returns>List [ Object { string fileId, string fileName, string fileSize, string createdByEmail, string createdById, DateTime uploaded, string uploadedStr, string directoryName, string directoryId } ]</returns>
         public static List<GetFilesResult> GetFiles(Parameters parameters, GetFilesInput input, CancellationToken cancellationToken)
         {
-            return new SendSafelyTasks().GetFilesNonStatic(parameters, input, cancellationToken);
-        }
-
-        private List<GetFilesResult> GetFilesNonStatic(Parameters parameters, GetFilesInput input, CancellationToken cancellationToken)
-        {
-            List<GetFilesResult> output = new List<GetFilesResult>();
+            List<GetFilesResult> result = new List<GetFilesResult>();
 
             api.ClientAPI ssApi = InitializeApi(parameters);
             api.PackageInformation pkg = ssApi.GetPackageInformation(input.PackageId);
 
-            GetFileInformationRecursively(ssApi, pkg.PackageId, pkg.RootDirectoryId, cancellationToken);
+            List<FileInfoWithDirInfo> fileList = GetFileInformationRecursively(ssApi, pkg.PackageId, pkg.RootDirectoryId, cancellationToken);
 
-            foreach (var file in fileInformation)
+            foreach (var file in fileList)
             {
-                output.Add(new GetFilesResult(file));
+                result.Add(new GetFilesResult(file));
             }
 
-            return output;
+            return result;
+        }
+
+        private static List<FileInfoWithDirInfo> GetFileInformationRecursively(api.ClientAPI ssApi, string packageId, string dirId, CancellationToken cancellationToken)
+        {
+            List<FileInfoWithDirInfo> fileList = new List<FileInfoWithDirInfo>();
+
+            api.Directory dir = ssApi.GetDirectory(packageId, dirId, 0, 0);
+
+            foreach (var file in dir.Files)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var ssFileInfo = ssApi.GetFileInformation(packageId, dirId, file.FileId);
+                FileInfoWithDirInfo fileInfo = new FileInfoWithDirInfo(ssFileInfo, dir);
+                fileList.Add(fileInfo);
+            }
+
+            foreach (var subdir in dir.SubDirectories)
+            {
+                fileList.AddRange(GetFileInformationRecursively(ssApi, packageId, subdir.DirectoryId, cancellationToken));
+            }
+
+            return fileList;
         }
 
         /// <summary>
@@ -302,24 +317,6 @@ namespace Frends.Community.SendSafely
             ssApi.InitialSetup(parameters.BaseUrl, parameters.ApiKey, parameters.ApiSecret);
             string userEmail = ssApi.VerifyCredentials();
             return ssApi;
-        }
-
-        private void GetFileInformationRecursively(api.ClientAPI ssApi, string packageId, string dirId, CancellationToken cancellationToken)
-        {
-            api.Directory dir = ssApi.GetDirectory(packageId, dirId, 0, 0);
-
-            foreach (var file in dir.Files)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                var ssFileInfo = ssApi.GetFileInformation(packageId, dirId, file.FileId);
-                FileInfoWithDirInfo fileInfo = new FileInfoWithDirInfo(ssFileInfo, dir);
-                fileInformation.Add(fileInfo);
-            }
-
-            foreach (var subdir in dir.SubDirectories)
-            {
-                GetFileInformationRecursively(ssApi, packageId, subdir.DirectoryId, cancellationToken);
-            }
         }
     }
 }
