@@ -9,7 +9,7 @@
     <IncludeSource>true</IncludeSource>
     <PackageTags>Frends</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Version>0.0.5</Version>
+    <Version>1.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -37,7 +37,7 @@
 
   <ItemGroup>
     <Reference Include="SendsafelyAPI">
-      <HintPath>..\..\Windows-Client\Windows-Client-API-master\SendsafelyAPI\bin\Debug\SendsafelyAPI.dll</HintPath>
+      <HintPath>..\SendsafelyAPI\bin\Debug\SendsafelyAPI.dll</HintPath>
     </Reference>
   </ItemGroup>
 

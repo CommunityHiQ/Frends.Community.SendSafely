@@ -197,3 +197,4 @@ NOTE: Be sure to merge the latest from "upstream" before making a pull request!
 | Version | Changes |
 | ------- | ------- |
 | 0.0.5   | Development still going on |
+| 1.0.0   | First version. Includes DownloadFiles, UploadFiles, GetDirectories, GetFiles, GetPackageInformation. |
