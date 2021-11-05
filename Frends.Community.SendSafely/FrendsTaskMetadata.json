@@ -10,10 +10,16 @@
 			"TaskMethod": "Frends.Community.SendSafely.SendSafelyTasks.GetDirectories"
 		},
 		{
+			"TaskMethod": "Frends.Community.SendSafely.SendSafelyTasks.CreateDirectory"
+		},
+		{
 			"TaskMethod": "Frends.Community.SendSafely.SendSafelyTasks.GetFiles"
 		},
 		{
 			"TaskMethod": "Frends.Community.SendSafely.SendSafelyTasks.GetPackageInformation"
+		},
+		{
+			"TaskMethod": "Frends.Community.SendSafely.SendSafelyTasks.GetPackageInformationFromLink"
 		}
 	]
 }

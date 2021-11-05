@@ -99,6 +99,31 @@ Returns a list of objects with the following parameters.
 | Files | `List<FileResponse>` | Meta data about the files in the directory. |  |
 | SubDirectories | `Collection<DirectoryResponse>` | Meta data about the subdirectories in the directory. |  |
 
+## CreateDirectory
+
+Creates a directory in a Workspace package.
+
+### Properties
+
+| Property | Type | Description | Example |
+| -------- | -------- | -------- | -------- |
+| BaseUrl | `string` | SendSafely base URL | `https://app.sendsafely.com` |
+| ApiKey | `string` | SendSafely API key |  |
+| ApiSecret | `string` | SendSafely API secret |  |
+| PackageId | `string` | Workspace package ID |  |
+| ParentDirectoryId | `string` | Directory ID |  |
+| DirectoryName | `string` | Name of the new directory | `new_dir` |
+
+### Returns
+
+| Property | Type | Description | Example |
+| -------- | -------- | -------- | -------- |
+| DirectoryId | `string` | Directory ID |  |
+| DirectoryName | `string` | Directory name | `example_dir` |
+| UserDirectory | `SendSafely.Directory` | User directory |  |
+| Files | `List<FileResponse>` | Meta data about the files in the directory. |  |
+| SubDirectories | `Collection<DirectoryResponse>` | Meta data about the subdirectories in the directory. |  |
+
 ## GetFiles
 
 Retrieves meta data about all files in a Workspace package.
@@ -163,6 +188,43 @@ Fetches the latest package meta data about a specific package given the unique p
 | AllowReplyAll | `bool` | Allow reply all, false if BCC recipients | `false` |
 | PackageParentId | `string` | Package parent ID |  |
 
+## GetPackageInformationFromLink
+
+Fetches the latest package meta data about a specific package given the package link.
+
+### Properties
+
+| Property | Type | Description | Example |
+| -------- | -------- | -------- | -------- |
+| BaseUrl | `string` | SendSafely base URL | `https://app.sendsafely.com` |
+| ApiKey | `string` | SendSafely API key |  |
+| ApiSecret | `string` | SendSafely API secret |  |
+| PackageLink | `string` | Package Link |  |
+
+### Returns
+
+| Property | Type | Description | Example |
+| -------- | -------- | -------- | -------- |
+| ContactGroups | `List<ContactGroup>` | A list of contact groups |  |
+| IsWorkspace | `bool` | The flag specifying the package is a Workspace. | `true` |
+| PackageDescriptor | `string` | The package descriptor | `Example` |
+| RootDirectoryId | `string` | The root directory of a Workspace package |  |
+| Status | `PackageStatus` | The status of the package | `0` |
+| State | `string` | The state of the pakage | `PACKAGE_STATE_ACTIVE_COMPLETE` |
+| PackageOwner | `string` | The Package Owner of the package | `user@hiq.fi` |
+| PackageTimestamp | `DateTime` | The timestamp of when the package was finalized. | `2021-10-12T09:31:55` |
+| Life | `int` | The current package life. The package life determines for how long the package should be available to the recipients. It's measured in days. | 0 |
+| Approvers | `List<string>` | A list of approvers that are currently attached to the package. |  |
+| Files | `List<SendSafely.File>` | A list of files that are currently attached to the package. |  |
+| Recipients | `List<SendSafely.Recipient>` | A list of recipients that are currently attached to the package. |  |
+| NeedsApprover | `bool` | NeedsApprover will be true when a package needs to add at least one approver before the package can be finalized. If the package is finalized without the approver, an exception will be thrown. | `false` |
+| ServerSecret | `string` | The server secret makes together with the keycode up the encryption key. The server secret is specific to a package and passed from the server. |  |
+| KeyCode | `string` | The keycode for the package. This key should always be kept client side and never be sent to the server. The keycode makes up one part of the encryption key. |  |
+| PackageCode | `string` | The package code for the given package. The package code is a part of the URL that must be sent to the recipients. |  |
+| PackageId | `string` | The package ID for the given package. |  |
+| AllowReplyAll | `bool` | Allow reply all, false if BCC recipients | `false` |
+| PackageParentId | `string` | Package parent ID |  |
+
 # Building
 
 Clone a copy of the repository
@@ -198,3 +260,4 @@ NOTE: Be sure to merge the latest from "upstream" before making a pull request!
 | ------- | ------- |
 | 0.0.5   | Development still going on |
 | 1.0.0   | First version. Includes DownloadFiles, UploadFiles, GetDirectories, GetFiles, GetPackageInformation. |
+| 1.1.0   | Added new methods: CreateDirectory and GetPackageInformationFromLink. |

@@ -245,6 +245,15 @@ namespace Frends.Community.SendSafely
         public string PackageId { get; set; }
     }
 
+    public class GetPackageInformationFromLinkInput
+    {
+        /// <summary>
+        /// Package link
+        /// </summary>
+        [DisplayFormat(DataFormatString = "Text")]
+        public string PackageLink { get; set; }
+    }
+
     public class GetPackageInformationResult
     {
         //
@@ -379,6 +388,24 @@ namespace Frends.Community.SendSafely
         /// </summary>
         [DisplayFormat(DataFormatString = "Text")]
         public string DirectoryName { get; set; }
+    }
+
+    public class CreateDirectoryResult
+    {
+        public api.Directory UserDirectory { get; set; }
+        public string DirectoryName { get; set; }
+        public string DirectoryId { get; set; }
+        public List<FileResponse> Files { get; set; }
+        public Collection<DirectoryResponse> SubDirectories { get; set; }
+
+        public CreateDirectoryResult(api.Directory directory)
+        {
+            this.DirectoryId = directory.DirectoryId;
+            this.DirectoryName = directory.DirectoryName;
+            this.UserDirectory = directory.UserDirectory;
+            this.Files = directory.Files;
+            this.SubDirectories = directory.SubDirectories;
+        }
     }
     #endregion
 

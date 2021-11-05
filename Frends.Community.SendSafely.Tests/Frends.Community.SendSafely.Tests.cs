@@ -9,9 +9,9 @@ namespace Frends.Community.SendSafely.Tests
     {
         public Parameters parameters = new Parameters
         {
-            BaseUrl = "",
-            ApiKey = "",
-            ApiSecret = ""
+            BaseUrl = "https://faksaamo.integrata.fi",
+            ApiKey = "ip7Y9d2tAheaEmLSTXmv2A",
+            ApiSecret = "N1bQ6aNdSnMeSoFyK28nBQ"
         };
 
         [Ignore("This is used to test with an actual SendSafely API.")]
@@ -88,6 +88,23 @@ namespace Frends.Community.SendSafely.Tests
 
         [Ignore("This is used to test with an actual SendSafely API.")]
         [Test]
+        public void CreateDirectory()
+        {
+            var input = new CreateDirectoryInput
+            {
+                PackageId = "",
+                ParentDirectoryId = "",
+                DirectoryName = "test_dir"
+            };
+
+            CreateDirectoryResult result = SendSafelyTasks.CreateDirectory(parameters, input);
+            string actualDirName = result.DirectoryName;
+
+            Assert.That(actualDirName, Is.EquivalentTo(input.DirectoryName));
+        }
+
+        [Ignore("This is used to test with an actual SendSafely API.")]
+        [Test]
         public void GetFiles()
         {
             var input = new GetFilesInput
@@ -113,6 +130,22 @@ namespace Frends.Community.SendSafely.Tests
 
             string expectedRootDirId = "";
             GetPackageInformationResult pkgInfo = SendSafelyTasks.GetPackageInformation(parameters, input);
+            string actualRootDirId = pkgInfo.RootDirectoryId;
+
+            Assert.That(actualRootDirId, Is.EqualTo(expectedRootDirId));
+        }
+
+        [Ignore("This is used to test with an actual SendSafely API.")]
+        [Test]
+        public void GetPackageInformationFromLink()
+        {
+            var input = new GetPackageInformationFromLinkInput
+            {
+                PackageLink = ""
+            };
+
+            string expectedRootDirId = "";
+            GetPackageInformationResult pkgInfo = SendSafelyTasks.GetPackageInformationFromLink(parameters, input);
             string actualRootDirId = pkgInfo.RootDirectoryId;
 
             Assert.That(actualRootDirId, Is.EqualTo(expectedRootDirId));

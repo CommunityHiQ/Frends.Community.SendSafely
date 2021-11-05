@@ -221,13 +221,28 @@ namespace Frends.Community.SendSafely
             return new GetPackageInformationResult(pkgInfo);
         }
 
-        // To be implemented
-        public static api.Directory CreateDirectory(Parameters parameters, CreateDirectoryInput input)
+        /// <summary>
+        /// Fetches the latest package meta data about a specific package given the package link.
+        /// </summary>
+        /// <returns>Object { List&lt;ContactGroup&gt; ContactGroups, bool IsWorkspace, string PackageDescriptor, string RootDirectoryId, PackageStatus Status, string State, string PackageOwner, DateTime PackageTimestamp, int Life, List&lt;string&gt; Approvers, List&lt;SendSafely.File&gt; Files, List&lt;SendSafely.Recipient&gt; Recipients, bool NeedsApprover, string ServerSecret, string KeyCode, string PackageCode, string PackageId, bool AllowReplyAll, string PackageParentId }</returns>
+        public static GetPackageInformationResult GetPackageInformationFromLink(Parameters parameters, GetPackageInformationFromLinkInput input)
+        {
+            api.ClientAPI ssApi = InitializeApi(parameters);
+            api.PackageInformation pkgInfo = ssApi.GetPackageInformationFromLink(input.PackageLink);
+
+            return new GetPackageInformationResult(pkgInfo);
+        }
+
+        /// <summary>
+        /// Creates a new directory in a SendSafely workspace.
+        /// </summary>
+        /// <returns>Object { SendSafely.Directory UserDirectory, string DirectoryName, string DirectoryId, List&lt;FileResponse&gt; Files, Collection&lt;DirectoryResponse&gt; SubDirectories }</returns>
+        public static CreateDirectoryResult CreateDirectory(Parameters parameters, CreateDirectoryInput input)
         {
             api.ClientAPI ssApi = InitializeApi(parameters);
             api.Directory newDir = ssApi.CreateDirectory(input.PackageId, input.ParentDirectoryId, input.DirectoryName);
 
-            return newDir;
+            return new CreateDirectoryResult(newDir);
         }
 
         // To be implemented
